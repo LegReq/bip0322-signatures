@@ -2,15 +2,17 @@
 
 [BIP-0322: Generic Signed Message Format](https://github.com/bitcoin/bips/blob/master/bip-0322.mediawiki)
 
-There are two jupyter notebooks in this folder. They attempt to demonstrate how you would use BIP-0322 signatures to sign and verify a VC. There is a notebook for each.
+The aim of this repository is to demonstrate how the Bitcoin Improvement Proposal (BIP) 0322 for a generic signed message format could be used to sign Verifiable Credentials from a Bitcoin address. Ultimately, this address will be identified through a did:btcr DID. 
 
-However, initially all these notebooks are trying to do is implement BIP-0322 signatures using the [buidl-python](https://github.com/buidl-bitcoin/buidl-python/) library developed by Jimmy Song. 
+This repository makes use of the [buidl-python](https://github.com/buidl-bitcoin/buidl-python/) Bitcoin library developed by Jimmy Song. It also uses Jupyter Notebooks to document the approach taken when implementing the BIP 0322 specification.
 
-## Current Issues
+## Author
 
-I am currently unable to either verify or produce the signature provided in the BIP-0322 test vectors. However, using the current implementation in the signing notebook I am able to produce a signature, that can be verified in the verification notebook.
+- Will Abramson
+- Legendary Requirements
+- <a href='mailto://will@legreq.com'>will@legreq.com</a>
 
-The most likely issue here is I have replicated the same error across both notebooks, however currently I have been unable to spot this.
+# Using the Repo
 
 ## Note: These instructions are for a linux machine
 
@@ -20,7 +22,7 @@ The most likely issue here is I have replicated the same error across both noteb
 * Pip
 
 
-## Running the Notebooks
+## Install Dependencies
 
 1. Create a virtual environment
 ```
@@ -36,6 +38,8 @@ source venv/bin/activate
 ```
 pip install -r requirements.txt
 ```
+
+## Run Notebooks
 
 4. Launch the jupyter server
 ```
