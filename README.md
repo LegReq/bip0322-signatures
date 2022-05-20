@@ -1,4 +1,4 @@
-# BIP-0322 Signatures for Verifiable Credentials
+# BIP-0322 Signatures
 
 [BIP-0322: Generic Signed Message Format](https://github.com/bitcoin/bips/blob/master/bip-0322.mediawiki)
 
