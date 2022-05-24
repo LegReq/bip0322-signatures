@@ -12,6 +12,10 @@ This repository makes use of the [buidl-python](https://github.com/buidl-bitcoin
 - Legendary Requirements
 - <a href='mailto://will@legreq.com'>will@legreq.com</a>
 
+## Acknowledgements
+
+This work was funded by Ryan Grant, Digital Contract Design. Thanks also go to Joe Andrieu, Kalle Alm, Pieter Wuille and Jimmy Song for engaging with and supporting various aspects of this work.
+
 # Using the Repo
 
 ## Note: These instructions are for a linux machine

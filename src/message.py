@@ -142,6 +142,7 @@ def is_full_signature(sig_bytes):
         Tx.parse(sig_stream)
     # TODO: more specific exception handling
     except:
+        print("Signature is not full")
         return False
     return True
         
@@ -159,8 +160,6 @@ def sign_message(format: MessageSignatureFormat, private_key: PrivateKey, addres
         
     b_msg = str_to_bytes(message)
     signature = private_key.sign_message(b_msg)
-    
-    print(signature.der().hex())
     
     return base64_encode(signature.der())    
     
@@ -195,16 +194,14 @@ def sign_message_bip322(format: MessageSignatureFormat, private_key: PrivateKey,
     else:
         return base64_encode(to_sign.serialize())
 
-def verify_message(address, signature, message):
+def verify_message(address: str, signature: str, message: str):
     
     sig_bytes = base64_decode(signature)
         
     to_spend = create_to_spend_tx(address, message)
-    
+
     to_sign = create_to_sign_tx(to_spend.hash(), sig_bytes)
-    
     to_sign.tx_ins[0]._script_pubkey = to_spend.tx_outs[0].script_pubkey
     to_sign.tx_ins[0]._value = to_spend.tx_outs[0].amount
-    
     return to_sign.verify_input(0)
     
