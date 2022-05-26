@@ -50,8 +50,10 @@ def create_to_spend_tx(address, message):
     value = 0
 
     # Convert address to a ScriptPubKey
+    # Will throw runtime error if unable to convert address to script_pubkey
     script_pubkey = address_to_script_pubkey(address)
-
+        
+    print("Is taproot", script_pubkey.is_p2tr())
 
     tx_out = TxOut(value,script_pubkey)
     
@@ -72,22 +74,26 @@ def create_to_sign_tx(to_spend_tx_hash, sig_bytes=None):
     to_sign = None
     if (sig_bytes and is_full_signature(sig_bytes)):
         
-        sig_stream = io.BytesIO(decoded_test_sig)
+        sig_stream = io.BytesIO(sig_bytes)
         to_sign = Tx.parse(sig_stream)
         
-        if (len(to_sign.tx_inputs) > 1):
+        if (len(to_sign.tx_ins) > 1):
             
             raise NotImplemented("Not yet implemented proof of funds yet")
-        elif (len(to_sign.tx_inputs) == 0):
+        elif (len(to_sign.tx_ins) == 0):
             raise ValueError("No transaction input")
-        elif (to_sign.tx_inputs[0].prev_tx != to_spend_txid):
+        elif (to_sign.tx_ins[0].prev_tx != to_spend_tx_hash):
+            print("prev_tx",to_sign.tx_ins[0].prev_tx)
+            print("to_spend_hash",to_spend_tx_hash)
             raise ValueError("The to_sign transaction input's prevtx id does not equal the calculated to_spend transaction id")
-        elif (len(to_sign.tx_outputs) != 1):
+        elif (len(to_sign.tx_outs) != 1):
             raise ValueError("to_sign does not have a single TxOutput")
-        elif (to_sign.tx_outputs[0].amount != 0):
-            raise ValueError("Value is Non 0", to_sign.tx_outputs[0].amount)
-        elif(to_sign.script_pubkey.commands != [106]):
-            raise ValueError("ScriptPubKey incorrect", to_sign.script_pubkey)
+        elif (to_sign.tx_outs[0].amount != 0):
+            raise ValueError("Value is Non 0", to_sign.tx_outs[0].amount)
+        elif(to_sign.tx_outs[0].script_pubkey.commands != [106]):
+            raise ValueError("ScriptPubKey incorrect", to_sign.tx_outs[0].script_pubkey)
+        else:
+            return to_sign
             
     else:
         # signature is either None or an encoded witness stack
@@ -129,7 +135,8 @@ def create_to_sign_tx(to_spend_tx_hash, sig_bytes=None):
                 to_sign_tx.tx_ins[0].witness = witness
             except:
                 # TODO: Fall back to legacy ...
-                raise ValueError("Signature is neither a witness or full transaction")
+                print("Signature is niether an encoded witness or full transaction. Fall back to legacy")
+                return None
                 
         return to_sign_tx
 
@@ -183,8 +190,13 @@ def sign_message_bip322(format: MessageSignatureFormat, private_key: PrivateKey,
     # Force the format to FULL, if this turned out to be a legacy format (p2pkh) signature
     if (len(to_sign.tx_ins[0].script_sig.commands) > 0 or len(to_sign.tx_ins[0].witness.items) == 0):
         format = MessageSignatureFormat.FULL
-    
-    
+
+    print(to_sign)
+    print("txIn tap script", to_sign.tx_ins[0].tap_script)
+    print("txIn witness", to_sign.tx_ins[0].witness)
+    print(sig_ok)
+    combined_script = to_sign.tx_ins[0].script_sig + to_sign.tx_ins[0].script_pubkey("mainnet")
+    print("Combined Script", combined_script)
     if (not sig_ok):
         raise RuntimeError("Unable to sign message")
     
@@ -195,12 +207,21 @@ def sign_message_bip322(format: MessageSignatureFormat, private_key: PrivateKey,
         return base64_encode(to_sign.serialize())
 
 def verify_message(address: str, signature: str, message: str):
-    
+
     sig_bytes = base64_decode(signature)
         
     to_spend = create_to_spend_tx(address, message)
-
+    
+    
     to_sign = create_to_sign_tx(to_spend.hash(), sig_bytes)
+    
+    if to_sign == None:
+        # try LEGACY
+        # Check address is a p2pkh
+        # Recover Secp256 point from signature?
+        # Verify signature
+        raise NotImplementedError("TODO")
+    
     to_sign.tx_ins[0]._script_pubkey = to_spend.tx_outs[0].script_pubkey
     to_sign.tx_ins[0]._value = to_spend.tx_outs[0].amount
     return to_sign.verify_input(0)
