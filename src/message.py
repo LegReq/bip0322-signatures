@@ -53,8 +53,6 @@ def create_to_spend_tx(address, message):
     # Will throw runtime error if unable to convert address to script_pubkey
     script_pubkey = address_to_script_pubkey(address)
         
-    print("Is taproot", script_pubkey.is_p2tr())
-
     tx_out = TxOut(value,script_pubkey)
     
     # create transaction
@@ -83,8 +81,6 @@ def create_to_sign_tx(to_spend_tx_hash, sig_bytes=None):
         elif (len(to_sign.tx_ins) == 0):
             raise ValueError("No transaction input")
         elif (to_sign.tx_ins[0].prev_tx != to_spend_tx_hash):
-            print("prev_tx",to_sign.tx_ins[0].prev_tx)
-            print("to_spend_hash",to_spend_tx_hash)
             raise ValueError("The to_sign transaction input's prevtx id does not equal the calculated to_spend transaction id")
         elif (len(to_sign.tx_outs) != 1):
             raise ValueError("to_sign does not have a single TxOutput")
@@ -114,11 +110,10 @@ def create_to_sign_tx(to_spend_tx_hash, sig_bytes=None):
         scriptPubKey = Script(commands)
 
         tx_output = TxOut(value,scriptPubKey)
-        
+        locktime=0
         version=0
         tx_inputs = [tx_input]
         tx_outputs = [tx_output]
-        locktime=0
         network="mainnet"
         # Could be false, but using a segwit address. I think this is the "Simple Signature" in BIP-0322
         segwit=True
@@ -149,7 +144,6 @@ def is_full_signature(sig_bytes):
         Tx.parse(sig_stream)
     # TODO: more specific exception handling
     except:
-        print("Signature is not full")
         return False
     return True
         
@@ -191,12 +185,7 @@ def sign_message_bip322(format: MessageSignatureFormat, private_key: PrivateKey,
     if (len(to_sign.tx_ins[0].script_sig.commands) > 0 or len(to_sign.tx_ins[0].witness.items) == 0):
         format = MessageSignatureFormat.FULL
 
-    print(to_sign)
-    print("txIn tap script", to_sign.tx_ins[0].tap_script)
-    print("txIn witness", to_sign.tx_ins[0].witness)
-    print(sig_ok)
     combined_script = to_sign.tx_ins[0].script_sig + to_sign.tx_ins[0].script_pubkey("mainnet")
-    print("Combined Script", combined_script)
     if (not sig_ok):
         raise RuntimeError("Unable to sign message")
     
