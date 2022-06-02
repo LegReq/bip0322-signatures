@@ -187,6 +187,7 @@ def sign_message_bip322(format: MessageSignatureFormat, private_key: PrivateKey,
 
     combined_script = to_sign.tx_ins[0].script_sig + to_sign.tx_ins[0].script_pubkey("mainnet")
     if (not sig_ok):
+        # TODO: this may be a multisig which successfully signed but needed additional signatures
         raise RuntimeError("Unable to sign message")
     
     if (format ==  MessageSignatureFormat.SIMPLE):
