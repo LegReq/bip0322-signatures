@@ -6,6 +6,15 @@ The aim of this repository is to demonstrate how the Bitcoin Improvement Proposa
 
 This repository makes use of the [buidl-python](https://github.com/buidl-bitcoin/buidl-python/) Bitcoin library developed by Jimmy Song. It also uses Jupyter Notebooks to document the approach taken when implementing the BIP 0322 specification.
 
+Currently implemented in repo:
+
+- BIP 322 Walkthrough [Signing](./BIP0322_signing.ipynb), [Verification](./BIP0322_verification.ipynb)
+- BIP 322 Buidl Python [API](./BIP322_interface.ipynb) and [library](./src/message.py). This has been submitted as a P.R. to [buidl-python](https://github.com/buidl-bitcoin/buidl-python/pull/140)
+- [BIP 322 p2sh multisig](./p2sh_multisig_bip322/)
+- [BIP 322 p2wsh multisig](./p2wsh_multisig_bip322/)
+- WIP [BIP322 Signatures for Verifiable Credentials](./vc/)
+- WIP [BIP322 p2tr signature](./experiments/taproot_bip322.ipynb)
+
 ## Author
 
 - Will Abramson
@@ -14,7 +23,7 @@ This repository makes use of the [buidl-python](https://github.com/buidl-bitcoin
 
 ## Acknowledgements
 
-This work was funded by Ryan Grant, Digital Contract Design. Thanks also go to Joe Andrieu, Kalle Alm, Pieter Wuille and Jimmy Song for engaging with and supporting various aspects of this work.
+This work was funded by Ryan Grant, [Digital Contract Design](https://contract.design/). Thanks also go to Joe Andrieu, Kalle Alm, Pieter Wuille and Jimmy Song for engaging with and supporting various aspects of this work.
 
 # Using the Repo
 
