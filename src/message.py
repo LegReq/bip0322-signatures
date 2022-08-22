@@ -36,8 +36,8 @@ def create_to_spend_tx(address, message):
     
     sequence = 0
 
-    b_msg = str_to_bytes(message)
-    message_hash = hash_bip322message(b_msg)
+#     b_msg = str_to_bytes(message)
+    message_hash = hash_bip322message(message)
 
     # Note BIP322 to_spend scriptSig commands = [0, 32, message_hash]
     # PUSH32 is implied and added by the size of the message added to the stack
@@ -148,7 +148,16 @@ def is_full_signature(sig_bytes):
     return True
         
 
-def sign_message(format: MessageSignatureFormat, private_key: PrivateKey, address: str, message: str):
+def sign_message(format: MessageSignatureFormat, private_key: PrivateKey, address: str, message):
+    
+
+    if not isinstance(message, bytes):
+        try:
+            message = str_to_bytes(message)
+
+        except e:
+            raise "Message must be bytes or string"   
+        
     
     if (format != MessageSignatureFormat.LEGACY):
         return sign_message_bip322(format,private_key,address,message)
@@ -159,14 +168,15 @@ def sign_message(format: MessageSignatureFormat, private_key: PrivateKey, addres
     if (not script_pubkey.is_p2pkh):
         raise ValueError("Address must be p2pkh for LEGACY signatures")
         
-    b_msg = str_to_bytes(message)
-    signature = private_key.sign_message(b_msg)
+
+
+    signature = private_key.sign_message(message)
     
     return base64_encode(signature.der())    
     
     
 
-def sign_message_bip322(format: MessageSignatureFormat, private_key: PrivateKey, address: str, message: str):
+def sign_message_bip322(format: MessageSignatureFormat, private_key: PrivateKey, address: str, message):
     
     assert(format != MessageSignatureFormat.LEGACY)
         
@@ -196,7 +206,15 @@ def sign_message_bip322(format: MessageSignatureFormat, private_key: PrivateKey,
     else:
         return base64_encode(to_sign.serialize())
 
-def verify_message(address: str, signature: str, message: str):
+def verify_message(address: str, signature: str, message):
+    
+    if not isinstance(message, bytes):
+        try:
+            message = str_to_bytes(message)
+
+        except e:
+            raise "Message must be bytes or string"   
+        
 
     sig_bytes = base64_decode(signature)
         
